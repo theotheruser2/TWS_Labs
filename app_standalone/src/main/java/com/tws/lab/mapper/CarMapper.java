@@ -9,9 +9,9 @@ public class CarMapper {
         return CarDto.builder()
                 .brand(car.getBrand())
                 .model(car.getModel())
-                .release_year(car.getReleaseYear())
-                .license_plate(car.getLicensePlate())
-                .owner_phone(car.getOwnerPhone())
+                .release_year(car.getRelease_year())
+                .license_plate(car.getLicense_plate())
+                .owner_phone(car.getOwner_phone())
                 .build();
     }
     public static Car toEntity(CarDto carDto) {
@@ -21,9 +21,9 @@ public class CarMapper {
         return Car.builder()
                 .brand(carDto.getBrand())
                 .model(carDto.getModel())
-                .release_year(carDto.getReleaseYear())
-                .license_plate(carDto.getLicensePlate())
-                .owner_phone(carDto.getOwnerPhone())
+                .release_year(carDto.getRelease_year())
+                .license_plate(carDto.getLicense_plate())
+                .owner_phone(carDto.getOwner_phone())
                 .build();
     }
 }

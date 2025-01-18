@@ -16,7 +16,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="carDto" type="{http://soap.se.ifmo.ru/}carDto" minOccurs="0"/&gt;
+ *         &lt;element name="carDto" type="{http://soap.lab.tws.com/}carDto" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;

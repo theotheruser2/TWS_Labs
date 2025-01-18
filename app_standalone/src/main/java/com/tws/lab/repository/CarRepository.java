@@ -54,9 +54,9 @@ public class CarRepository {
             }
             existingCar.setBrand(newDetails.getBrand());
             existingCar.setModel(newDetails.getModel());
-            existingCar.setReleaseYear(newDetails.getReleaseYear());
-            existingCar.setLicensePlate(newDetails.getLicensePlate());
-            existingCar.setOwnerPhone(newDetails.getOwnerPhone());
+            existingCar.setRelease_year(newDetails.getRelease_year());
+            existingCar.setLicense_plate(newDetails.getLicense_plate());
+            existingCar.setOwner_phone(newDetails.getOwner_phone());
             entityManager.getTransaction().commit();
             return true;
         }

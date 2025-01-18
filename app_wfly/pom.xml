@@ -81,7 +81,7 @@
     </dependencies>
 
     <build>
-        <finalName>tws1-j2ee</finalName>
+        <finalName>tws2-j2ee</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

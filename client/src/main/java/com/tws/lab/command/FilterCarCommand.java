@@ -49,7 +49,7 @@ public class FilterCarCommand implements CliCommand {
                 System.out.println("-".repeat(85));
 
                 for (Car car : filteredCars) {
-                    System.out.println(String.format("%-10d | %-10s | %-8s | %-15s | %-18s | %-5d",
+                    System.out.println(String.format("%-10d | %-10s | %-8s | %-15s | %-17s | %-5d",
                             car.getId(), car.getBrand(), car.getModel(), car.getLicensePlate(),
                             car.getOwnerPhone(), car.getReleaseYear()));
                 }
