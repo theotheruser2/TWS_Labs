@@ -6,6 +6,7 @@ import jakarta.jws.WebService;
 import com.tws.lab.model.dto.CarListRequestDto;
 import com.tws.lab.model.entity.Car;
 import com.tws.lab.service.CarService;
+import com.tws.lab.model.dto.CarDto;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,5 +30,21 @@ public class CarWebService {
         int offset = carListRequestDto.getOffset() != null ? carListRequestDto.getOffset() : 0;
 
         return carService.searchCars(carListRequestDto.getQuery(), limit, offset);
+    }
+    @WebMethod
+    public Car findCarById(@WebParam(name = "id") int id) {
+        return carService.readCar(id);
+    }
+    @WebMethod
+    public int createCar(@WebParam(name = "carDto") CarDto carDto) {
+        return carService.createCar(carDto);
+    }
+    @WebMethod
+    public boolean updateCar(@WebParam(name = "id") int id, @WebParam(name = "carDto") CarDto carDto) {
+        return carService.updateCar(id, carDto);
+    }
+    @WebMethod
+    public boolean deleteCarById(@WebParam(name = "id") int id) {
+        return carService.deleteCarById(id);
     }
 }

@@ -32,7 +32,47 @@ public class CarRepository {
                     .getResultList();
         }
     }
-
+    public Car readCar(int id) {
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            return entityManager.find(Car.class, id);
+        }
+    }
+    public int createCar(Car car) {
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            entityManager.getTransaction().begin();
+            entityManager.persist(car);
+            entityManager.getTransaction().commit();
+            return car.getId();
+        }
+    }
+    public boolean updateCar(int id, Car newDetails) {
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            entityManager.getTransaction().begin();
+            Car existingCar = entityManager.find(Car.class, id);
+            if (existingCar == null) {
+                return false;
+            }
+            existingCar.setBrand(newDetails.getBrand());
+            existingCar.setModel(newDetails.getModel());
+            existingCar.setReleaseYear(newDetails.getReleaseYear());
+            existingCar.setLicensePlate(newDetails.getLicensePlate());
+            existingCar.setOwnerPhone(newDetails.getOwnerPhone());
+            entityManager.getTransaction().commit();
+            return true;
+        }
+    }
+    public boolean deleteCarById(int id) {
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            entityManager.getTransaction().begin();
+            Car car = entityManager.find(Car.class, id);
+            if (car == null) {
+                return false;
+            }
+            entityManager.remove(car);
+            entityManager.getTransaction().commit();
+            return true;
+        }
+    }
     private Predicate parseQueryToPredicate(String query, CriteriaBuilder builder, Root<Car> root) {
         if (query == null || query.trim().isEmpty()) {
             return null;

@@ -2,11 +2,13 @@ package com.tws.lab.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cars")
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
