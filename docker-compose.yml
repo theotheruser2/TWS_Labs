@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${DB}
+      POSTGRES_PASSWORD: ${DB_USER}
+      POSTGRES_DB: ${DB_PASSWORD}
+    volumes:
+      - ./PSQL_scripts/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
+      - ./PSQL_scripts/insert_car_data.sql:/docker-entrypoint-initdb.d/insert_car_data.sql
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
