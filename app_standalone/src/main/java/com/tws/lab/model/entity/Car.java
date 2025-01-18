@@ -24,7 +24,7 @@ public class Car {
     private String model;
 
     @Column(name = "release_year")
-    private int release_year;
+    private Integer release_year;
 
     @Column(name = "license_plate")
     private String license_plate;

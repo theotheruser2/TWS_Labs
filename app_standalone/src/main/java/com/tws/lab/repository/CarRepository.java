@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.criteria.*;
 import com.tws.lab.model.entity.Car;
+import com.tws.lab.soap.errorHandling.*;
 
 import java.util.List;
 import java.util.Stack;
@@ -15,7 +16,13 @@ public class CarRepository {
         this.entityManagerFactory = entityManagerFactory;
     }
 
-    public List<Car> findCar(String query, int limit, int offset) {
+    public List<Car> findCar(String query, int limit, int offset) throws CarCrudException {
+        if (limit < 0 || offset < 0) {
+            throw new CarCrudException(
+                    "Параметры заданы неверно",
+                    new ErrorBean("Лимит записей и смещение должны иметь значения >= 0.")
+            );
+        }
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             CriteriaBuilder builder = entityManager.getCriteriaBuilder();
             CriteriaQuery<Car> criteriaQuery = builder.createQuery(Car.class);
@@ -30,6 +37,12 @@ public class CarRepository {
                     .setFirstResult(offset)
                     .setMaxResults(limit)
                     .getResultList();
+        } catch (Exception e) {
+            throw new CarCrudException(
+                    "Ошибка при поиске автомобилей",
+                    new ErrorBean("Ошибка при обработке запроса." + e.getMessage()),
+                    e
+            );
         }
     }
     public Car readCar(int id) {

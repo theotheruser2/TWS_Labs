@@ -27,6 +27,21 @@ public interface CarWebService {
 
     /**
      * 
+     * @param id
+     * @return
+     *     returns boolean
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "deleteCarById", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarById")
+    @ResponseWrapper(localName = "deleteCarByIdResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarByIdResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/deleteCarByIdRequest", output = "http://soap.lab.tws.com/CarWebService/deleteCarByIdResponse")
+    public boolean deleteCarById(
+        @WebParam(name = "id", targetNamespace = "")
+        int id);
+
+    /**
+     * 
      * @param carDto
      * @return
      *     returns int
@@ -39,21 +54,6 @@ public interface CarWebService {
     public int createCar(
         @WebParam(name = "carDto", targetNamespace = "")
         CarDto carDto);
-
-    /**
-     * 
-     * @param arg0
-     * @return
-     *     returns java.util.List<com.tws.lab.soap.Car>
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "searchCars", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCars")
-    @ResponseWrapper(localName = "searchCarsResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCarsResponse")
-    @Action(input = "http://soap.lab.tws.com/CarWebService/searchCarsRequest", output = "http://soap.lab.tws.com/CarWebService/searchCarsResponse")
-    public List<Car> searchCars(
-        @WebParam(name = "arg0", targetNamespace = "")
-        CarListRequestDto arg0);
 
     /**
      * 
@@ -77,21 +77,6 @@ public interface CarWebService {
      * 
      * @param id
      * @return
-     *     returns boolean
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "deleteCarById", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarById")
-    @ResponseWrapper(localName = "deleteCarByIdResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarByIdResponse")
-    @Action(input = "http://soap.lab.tws.com/CarWebService/deleteCarByIdRequest", output = "http://soap.lab.tws.com/CarWebService/deleteCarByIdResponse")
-    public boolean deleteCarById(
-        @WebParam(name = "id", targetNamespace = "")
-        int id);
-
-    /**
-     * 
-     * @param id
-     * @return
      *     returns com.tws.lab.soap.Car
      */
     @WebMethod
@@ -102,5 +87,20 @@ public interface CarWebService {
     public Car findCarById(
         @WebParam(name = "id", targetNamespace = "")
         int id);
+
+    /**
+     * 
+     * @param arg0
+     * @return
+     *     returns java.util.List<com.tws.lab.soap.Car>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "searchCars", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCars")
+    @ResponseWrapper(localName = "searchCarsResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCarsResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/searchCarsRequest", output = "http://soap.lab.tws.com/CarWebService/searchCarsResponse")
+    public List<Car> searchCars(
+        @WebParam(name = "arg0", targetNamespace = "")
+        CarListRequestDto arg0);
 
 }

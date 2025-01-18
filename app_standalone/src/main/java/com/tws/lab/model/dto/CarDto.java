@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class CarDto {
     private String brand;
     private String model;
-    private int release_year;
+    private Integer release_year;
     private String license_plate;
     private String owner_phone;
 }

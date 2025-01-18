@@ -12,8 +12,12 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
+        System.setProperty("file.encoding", "UTF-8");
+        System.setProperty("sun.jnu.encoding", "UTF-8");
         System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
         System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 
         Map<String, String> env = System.getenv();
         String dbUrl = env.getOrDefault("DB_URL", "jdbc:postgresql://localhost:5432/postgres");

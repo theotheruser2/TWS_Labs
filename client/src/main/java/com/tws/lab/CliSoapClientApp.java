@@ -1,15 +1,21 @@
-
 package com.tws.lab;
 
 import com.tws.lab.command.CliCommand;
 
 import java.util.Map;
 import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
 
 import static com.tws.lab.utils.Util.produceCommands;
 
 public class CliSoapClientApp {
     public static void main(String[] args) {
+        // Set character encoding properties
+        System.setProperty("file.encoding", "UTF-8");
+        System.setProperty("sun.jnu.encoding", "UTF-8");
+        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
+        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
+
         String soapUrl = System.getenv("SOAP_SERVICE_URL");
         if (args.length > 0) {
             soapUrl = args[0];
@@ -22,13 +28,9 @@ public class CliSoapClientApp {
 
         try {
             Map<String, CliCommand> commands = produceCommands(soapUrl);
-            Scanner scanner = new Scanner(System.in);
+            Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
 
-            System.out.println("Доступные команды:");
-            int index = 1;
-            for (CliCommand command : commands.values()) {
-                System.out.println(index++ + ") " + command.getName() + " - " + command.getDescription());
-            }
+            System.out.println("Для получения списка доступных команд используйте 'help'.");
 
             while (true) {
                 System.out.print("Введите команду: ");

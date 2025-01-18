@@ -7,6 +7,8 @@ import com.tws.lab.model.dto.CarListRequestDto;
 import com.tws.lab.model.entity.Car;
 import com.tws.lab.service.CarService;
 import com.tws.lab.model.dto.CarDto;
+import com.tws.lab.soap.errorHandling.*;
+import com.tws.lab.service.ValidationService;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +22,7 @@ public class CarWebService {
     }
 
     @WebMethod
-    public List<Car> searchCars(@WebParam(name = "arg0") CarListRequestDto carListRequestDto) {
+    public List<Car> searchCars(@WebParam(name = "arg0") CarListRequestDto carListRequestDto) throws CarCrudException{
         if (carListRequestDto == null) {
             System.out.println(" null CarListRequestDto");
             return Collections.emptyList();
@@ -36,13 +38,18 @@ public class CarWebService {
         return carService.readCar(id);
     }
     @WebMethod
-    public int createCar(@WebParam(name = "carDto") CarDto carDto) {
+    public int createCar(@WebParam(name = "carDto") CarDto carDto) throws CarCrudException{
+        ValidationService.validateCarDto(carDto);
         return carService.createCar(carDto);
     }
     @WebMethod
-    public boolean updateCar(@WebParam(name = "id") int id, @WebParam(name = "carDto") CarDto carDto) {
-        return carService.updateCar(id, carDto);
-    }
+    public boolean updateCar(@WebParam(name = "id") int id, @WebParam(name = "carDto") CarDto carDto) throws CarCrudException {
+        ValidationService.validateCarDto(carDto);
+        boolean updated = carService.updateCar(id, carDto);
+        if (!updated) {
+            throw new CarCrudException("Автомобиль не найден", new ErrorBean("Не найдена запись с идентификатором: " + id));
+        }
+        return true;    }
     @WebMethod
     public boolean deleteCarById(@WebParam(name = "id") int id) {
         return carService.deleteCarById(id);
