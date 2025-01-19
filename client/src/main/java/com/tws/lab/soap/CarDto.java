@@ -21,7 +21,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         &lt;element name="license_plate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="model" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="owner_phone" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="release_year" type="{http://www.w3.org/2001/XMLSchema}int"/&gt;
+ *         &lt;element name="release_year" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -47,7 +47,7 @@ public class CarDto {
     @XmlElement(name = "owner_phone")
     protected String ownerPhone;
     @XmlElement(name = "release_year")
-    protected int releaseYear;
+    protected Integer releaseYear;
 
     /**
      * Gets the value of the brand property.
@@ -148,16 +148,24 @@ public class CarDto {
     /**
      * Gets the value of the releaseYear property.
      * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
      */
-    public int getReleaseYear() {
+    public Integer getReleaseYear() {
         return releaseYear;
     }
 
     /**
      * Sets the value of the releaseYear property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
      */
-    public void setReleaseYear(int value) {
+    public void setReleaseYear(Integer value) {
         this.releaseYear = value;
     }
 

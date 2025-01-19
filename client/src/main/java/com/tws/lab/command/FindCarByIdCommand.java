@@ -12,9 +12,28 @@ public class FindCarByIdCommand implements CliCommand {
     }
     @Override
     public void execute(Scanner scanner) {
-        System.out.print("Введите идентификатор автомобиля: ");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // очистка буфера
+        int id = -1;
+        while (true) {
+            System.out.print("Введите идентификатор автомобиля (или введите 'exit' для выхода): ");
+            String input = scanner.nextLine().trim();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("Выход из команды поиска автомобиля.");
+                return;
+            }
+
+            try {
+                id = Integer.parseInt(input);
+                if (id <= 0) {
+                    System.out.println("Ошибка: идентификатор должен быть положительным числом. Попробуйте снова.");
+                    continue;
+                }
+                break; // Exit loop if valid
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите корректное число или 'exit' для выхода.");
+            }
+        }
+
         try {
             Car car = carWebService.findCarById(id);
             if (car == null) {
@@ -33,6 +52,7 @@ public class FindCarByIdCommand implements CliCommand {
             System.out.println("Ошибка при поиске автомобиля: " + e.getMessage());
         }
     }
+
 
     @Override
     public String getName() {

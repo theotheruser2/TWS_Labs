@@ -4,9 +4,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.lang.reflect.Field;
 
 import com.tws.lab.soap.CarService;
 import com.tws.lab.soap.CarWebService;
@@ -28,26 +31,52 @@ public class Util {
             }
         }
     }
+
     public static CarDto getCarDtoFromInput(Scanner scanner) {
-        System.out.println("Введите данные об автомобиле:");
-        System.out.print("Марка: ");
-        String brand = scanner.nextLine();
-        System.out.print("Модель: ");
-        String model = scanner.nextLine();
-        System.out.print("Год выпуска: ");
-        int release_year = Integer.parseInt(scanner.nextLine());
-        System.out.print("Регистрационный номер: ");
-        String license_plate = scanner.nextLine();
-        System.out.print("Телефон владельца: ");
-        String owner_phone = scanner.nextLine();
+
         CarDto carDto = new CarDto();
-        carDto.setBrand(brand);
-        carDto.setModel(model);
-        carDto.setReleaseYear(release_year);
-        carDto.setLicensePlate(license_plate);
-        carDto.setOwnerPhone(owner_phone);
+        System.out.println("Введите данные об автомобиле.");
+        for (Field field : CarDto.class.getDeclaredFields()) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            String fieldType = field.getType().getSimpleName();
+            String userFriendlyName = switch (fieldName) {
+                case "brand" -> "Марка";
+                case "model" -> "Модель";
+                case "releaseYear" -> "Год выпуска";
+                case "licensePlate" -> "Регистрационный номер";
+                case "ownerPhone" -> "Телефон владельца";
+                default -> fieldName;
+            };
+
+            while (true) {
+                System.out.print(userFriendlyName + " (" + fieldType + "): ");
+                String input = scanner.nextLine().trim();
+
+                try {
+                    if (fieldType.equals("String")) {
+                        field.set(carDto, input);
+                    } else if (fieldType.equals("Integer")) {
+                        try {
+                            int value = Integer.parseInt(input);
+                            if (fieldName.equals("releaseYear") && value < 1885) {
+                                throw new IllegalArgumentException("Год выпуска не может быть ранее 1885.");
+                            }
+                            field.set(carDto, value);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Ошибка: Введите корректное число.");
+                            continue;
+                        }
+                    }
+                    break; // Exit the loop if input is valid
+                } catch (IllegalAccessException | IllegalArgumentException e) {
+                    System.out.println("Ошибка ввода: " + e.getMessage());
+                }
+            }
+        }
         return carDto;
     }
+
     public static Map<String, CliCommand> produceCommands(String soapUrl) throws Exception {
         Map<String, CliCommand> commands = new HashMap<>();
 

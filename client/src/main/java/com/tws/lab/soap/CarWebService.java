@@ -8,6 +8,7 @@ import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
 import jakarta.xml.ws.Action;
+import jakarta.xml.ws.FaultAction;
 import jakarta.xml.ws.RequestWrapper;
 import jakarta.xml.ws.ResponseWrapper;
 
@@ -27,6 +28,69 @@ public interface CarWebService {
 
     /**
      * 
+     * @param carDto
+     * @param id
+     * @return
+     *     returns boolean
+     * @throws CarCrudException_Exception
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "updateCar", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.UpdateCar")
+    @ResponseWrapper(localName = "updateCarResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.UpdateCarResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/updateCarRequest", output = "http://soap.lab.tws.com/CarWebService/updateCarResponse", fault = {
+        @FaultAction(className = CarCrudException_Exception.class, value = "http://soap.lab.tws.com/CarWebService/updateCar/Fault/CarCrudException")
+    })
+    public boolean updateCar(
+        @WebParam(name = "id", targetNamespace = "")
+        int id,
+        @WebParam(name = "carDto", targetNamespace = "")
+        CarDto carDto)
+        throws CarCrudException_Exception
+    ;
+
+    /**
+     * 
+     * @param carDto
+     * @return
+     *     returns int
+     * @throws CarCrudException_Exception
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "createCar", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.CreateCar")
+    @ResponseWrapper(localName = "createCarResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.CreateCarResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/createCarRequest", output = "http://soap.lab.tws.com/CarWebService/createCarResponse", fault = {
+        @FaultAction(className = CarCrudException_Exception.class, value = "http://soap.lab.tws.com/CarWebService/createCar/Fault/CarCrudException")
+    })
+    public int createCar(
+        @WebParam(name = "carDto", targetNamespace = "")
+        CarDto carDto)
+        throws CarCrudException_Exception
+    ;
+
+    /**
+     * 
+     * @param arg0
+     * @return
+     *     returns java.util.List<com.tws.lab.soap.Car>
+     * @throws CarCrudException_Exception
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "searchCars", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCars")
+    @ResponseWrapper(localName = "searchCarsResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCarsResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/searchCarsRequest", output = "http://soap.lab.tws.com/CarWebService/searchCarsResponse", fault = {
+        @FaultAction(className = CarCrudException_Exception.class, value = "http://soap.lab.tws.com/CarWebService/searchCars/Fault/CarCrudException")
+    })
+    public List<Car> searchCars(
+        @WebParam(name = "arg0", targetNamespace = "")
+        CarListRequestDto arg0)
+        throws CarCrudException_Exception
+    ;
+
+    /**
+     * 
      * @param id
      * @return
      *     returns boolean
@@ -42,39 +106,6 @@ public interface CarWebService {
 
     /**
      * 
-     * @param carDto
-     * @return
-     *     returns int
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "createCar", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.CreateCar")
-    @ResponseWrapper(localName = "createCarResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.CreateCarResponse")
-    @Action(input = "http://soap.lab.tws.com/CarWebService/createCarRequest", output = "http://soap.lab.tws.com/CarWebService/createCarResponse")
-    public int createCar(
-        @WebParam(name = "carDto", targetNamespace = "")
-        CarDto carDto);
-
-    /**
-     * 
-     * @param carDto
-     * @param id
-     * @return
-     *     returns boolean
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "updateCar", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.UpdateCar")
-    @ResponseWrapper(localName = "updateCarResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.UpdateCarResponse")
-    @Action(input = "http://soap.lab.tws.com/CarWebService/updateCarRequest", output = "http://soap.lab.tws.com/CarWebService/updateCarResponse")
-    public boolean updateCar(
-        @WebParam(name = "id", targetNamespace = "")
-        int id,
-        @WebParam(name = "carDto", targetNamespace = "")
-        CarDto carDto);
-
-    /**
-     * 
      * @param id
      * @return
      *     returns com.tws.lab.soap.Car
@@ -87,20 +118,5 @@ public interface CarWebService {
     public Car findCarById(
         @WebParam(name = "id", targetNamespace = "")
         int id);
-
-    /**
-     * 
-     * @param arg0
-     * @return
-     *     returns java.util.List<com.tws.lab.soap.Car>
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "searchCars", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCars")
-    @ResponseWrapper(localName = "searchCarsResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.SearchCarsResponse")
-    @Action(input = "http://soap.lab.tws.com/CarWebService/searchCarsRequest", output = "http://soap.lab.tws.com/CarWebService/searchCarsResponse")
-    public List<Car> searchCars(
-        @WebParam(name = "arg0", targetNamespace = "")
-        CarListRequestDto arg0);
 
 }

@@ -1,14 +1,21 @@
 package com.tws.lab.command;
+
 import com.tws.lab.soap.Car;
 import com.tws.lab.soap.CarDto;
 import com.tws.lab.soap.CarWebService;
 import com.tws.lab.utils.Util;
+import com.tws.lab.soap.CarCrudException_Exception;
+
 import java.util.Scanner;
+
+
 public class UpdateCarCommand implements CliCommand {
     private final CarWebService carWebService;
+
     public UpdateCarCommand(CarWebService carWebService) {
         this.carWebService = carWebService;
     }
+
     @Override
     public void execute(Scanner scanner) {
         System.out.print("Введите идентификатор автомобиля для обновления записи: ");
@@ -27,14 +34,18 @@ public class UpdateCarCommand implements CliCommand {
             } else {
                 System.out.println("Не удалось обновить запись.");
             }
+        } catch (CarCrudException_Exception e) {
+            System.out.println("Ошибка при обновлении записи об автомобиле: " + e.getFaultInfo().getErrorInfo().getMessage());
         } catch (Exception e) {
             System.out.println("Ошибка при обновлении записи: " + e.getMessage());
         }
     }
+
     @Override
     public String getName() {
         return "update";
     }
+
     @Override
     public String getDescription() {
         return "Обновление записи об автомобиле по ID.";

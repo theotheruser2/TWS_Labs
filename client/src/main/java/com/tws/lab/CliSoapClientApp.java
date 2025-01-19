@@ -13,8 +13,6 @@ public class CliSoapClientApp {
         // Set character encoding properties
         System.setProperty("file.encoding", "UTF-8");
         System.setProperty("sun.jnu.encoding", "UTF-8");
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
 
         String soapUrl = System.getenv("SOAP_SERVICE_URL");
         if (args.length > 0) {

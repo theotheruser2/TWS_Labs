@@ -24,6 +24,7 @@ import jakarta.xml.bind.annotation.XmlRegistry;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _CarServiceFault_QNAME = new QName("http://soap.lab.tws.com/", "CarServiceFault");
     private final static QName _CreateCar_QNAME = new QName("http://soap.lab.tws.com/", "createCar");
     private final static QName _CreateCarResponse_QNAME = new QName("http://soap.lab.tws.com/", "createCarResponse");
     private final static QName _DeleteCarById_QNAME = new QName("http://soap.lab.tws.com/", "deleteCarById");
@@ -40,6 +41,14 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link CarCrudException }
+     * 
+     */
+    public CarCrudException createCarCrudException() {
+        return new CarCrudException();
     }
 
     /**
@@ -139,11 +148,32 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ErrorBean }
+     * 
+     */
+    public ErrorBean createErrorBean() {
+        return new ErrorBean();
+    }
+
+    /**
      * Create an instance of {@link CarListRequestDto }
      * 
      */
     public CarListRequestDto createCarListRequestDto() {
         return new CarListRequestDto();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CarCrudException }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link CarCrudException }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "CarServiceFault")
+    public JAXBElement<CarCrudException> createCarServiceFault(CarCrudException value) {
+        return new JAXBElement<CarCrudException>(_CarServiceFault_QNAME, CarCrudException.class, null, value);
     }
 
     /**

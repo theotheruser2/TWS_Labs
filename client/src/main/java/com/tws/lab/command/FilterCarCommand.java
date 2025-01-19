@@ -5,6 +5,7 @@ import com.tws.lab.soap.Car;
 import com.tws.lab.soap.CarListRequestDto;
 import com.tws.lab.soap.CarWebService;
 import com.tws.lab.utils.Util;
+import com.tws.lab.soap.CarCrudException_Exception;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -54,6 +55,8 @@ public class FilterCarCommand implements CliCommand {
                             car.getOwnerPhone(), car.getReleaseYear()));
                 }
             }
+        } catch (CarCrudException_Exception e) {
+            System.out.println("Ошибка при поиске записей об автомобиле: " + e.getFaultInfo().getErrorInfo().getMessage());
         } catch (Exception e) {
             System.out.println("Ошибка фильтрации: " + e.getMessage());
         }
