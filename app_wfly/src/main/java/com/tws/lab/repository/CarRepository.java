@@ -5,15 +5,17 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import com.tws.lab.model.entity.Car;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Stack;
 
 @ApplicationScoped
 public class CarRepository {
-    @PersistenceContext(unitName = "PostgresDS")
-    EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
+    @Transactional
     public List<Car> findCar(String query, int limit, int offset) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Car> criteriaQuery = builder.createQuery(Car.class);
@@ -28,7 +30,6 @@ public class CarRepository {
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
-
     }
 
     private Predicate parseQueryToPredicate(String query, CriteriaBuilder builder, Root<Car> root) {
@@ -36,17 +37,39 @@ public class CarRepository {
             return null;
         }
 
+        query = query.replace("+", " ");
+        try {
+            query = java.net.URLDecoder.decode(query, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid query format: " + e.getMessage());
+        }
+
+        query = query.replaceAll("([=><~!]+=?)", " $1 ")  // Handle =, >, <, >=, <=, ~, !=
+                   .replaceAll("([()])", " $1 ")          
+                   .replaceAll("\\s+", " ")               
+                   .trim();
+
         Stack<Predicate> predicateStack = new Stack<>();
         Stack<String> operatorStack = new Stack<>();
 
-        int index = 0;
-        while (index < query.length()) {
-            char currentChar = query.charAt(index);
+        String[] tokens = query.split("\\s+");
+        int i = 0;
+        while (i < tokens.length) {
+            String token = tokens[i];
 
-            if (currentChar == '(') {
-                operatorStack.push(String.valueOf(currentChar));
-                index++;
-            } else if (currentChar == ')') {
+            if (token.equalsIgnoreCase("AND") || token.equalsIgnoreCase("OR")) {
+                while (!operatorStack.isEmpty() && !operatorStack.peek().equals("(") && precedence(operatorStack.peek()) >= precedence(token)) {
+                    String operator = operatorStack.pop();
+                    Predicate right = predicateStack.pop();
+                    Predicate left = predicateStack.pop();
+                    predicateStack.push(combinePredicates(builder, left, right, operator));
+                }
+                operatorStack.push(token);
+                i++;
+            } else if (token.equals("(")) {
+                operatorStack.push(token);
+                i++;
+            } else if (token.equals(")")) {
                 while (!operatorStack.isEmpty() && !operatorStack.peek().equals("(")) {
                     String operator = operatorStack.pop();
                     Predicate right = predicateStack.pop();
@@ -54,42 +77,50 @@ public class CarRepository {
                     predicateStack.push(combinePredicates(builder, left, right, operator));
                 }
                 operatorStack.pop();
-                index++;
-            } else if (Character.isWhitespace(currentChar)) {
-                index++;
+                i++;
             } else {
-                StringBuilder conditionBuilder = new StringBuilder();
-                while (index < query.length() && query.charAt(index) != ' ' && query.charAt(index) != '(' && query.charAt(index) != ')') {
-                    conditionBuilder.append(query.charAt(index));
-                    index++;
+                if (i + 2 >= tokens.length) {
+                    throw new IllegalArgumentException("Incorrect query format. Expected format: 'field=value' or 'field operator value' where operator can be =, !=, >, >=, <, <=, or ~ for LIKE queries");
                 }
-                String condition = conditionBuilder.toString().trim();
 
-                if (condition.equalsIgnoreCase("AND") || condition.equalsIgnoreCase("OR")) {
-                    while (!operatorStack.isEmpty() && !operatorStack.peek().equals("(") && precedence(operatorStack.peek()) >= precedence(condition)) {
-                        String operator = operatorStack.pop();
-                        Predicate right = predicateStack.pop();
-                        Predicate left = predicateStack.pop();
-                        predicateStack.push(combinePredicates(builder, left, right, operator));
-                    }
-                    operatorStack.push(condition);
-                } else {
-                    String[] parts = condition.split("=|!=|>=|<=|>|<|~|!~", 2);
-                    if (parts.length != 2) {
-                        throw new IllegalArgumentException("Некорректный формат запроса. Ожидаемый формат: 'поле оператор значение'");
-                    }
+                String field = token;
+                String operator = tokens[i + 1].toLowerCase();
+                String value = tokens[i + 2];
 
-                    String field = parts[0].trim();
-                    String operator = condition.substring(parts[0].length(), condition.length() - parts[1].length()).trim();
-                    String value = parts[1].trim().replace("\"", "");
+                // match entity property name
+                if (field.equals("release_year")) {
+                    field = "releaseYear";
+                } else if (field.equals("license_plate")) {
+                    field = "licensePlate";
+                } else if (field.equals("owner_phone")) {
+                    field = "ownerPhone";
+                }
 
-                    Path<Object> path;
+                Path<Object> path;
+                try {
+                    path = root.get(field);
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Could not resolve field '" + field + "' of type '" + root.getJavaType().getName() + "'");
+                }
+
+                // Handle numeric fields differently
+                if (field.equals("releaseYear")) {
                     try {
-                        path = root.get(field);
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException("Не удалось определить поле '" + field + "' типа '" + root.getJavaType().getName() + "'");
+                        Integer numericValue = Integer.parseInt(value);
+                        Predicate predicate = switch (operator) {
+                            case "=" -> builder.equal(path, numericValue);
+                            case "!=" -> builder.notEqual(path, numericValue);
+                            case ">" -> builder.greaterThan(path.as(Integer.class), numericValue);
+                            case ">=" -> builder.greaterThanOrEqualTo(path.as(Integer.class), numericValue);
+                            case "<" -> builder.lessThan(path.as(Integer.class), numericValue);
+                            case "<=" -> builder.lessThanOrEqualTo(path.as(Integer.class), numericValue);
+                            default -> throw new IllegalArgumentException("Invalid operator for numeric field: " + operator);
+                        };
+                        predicateStack.push(predicate);
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException("Invalid numeric value for field '" + field + "': " + value);
                     }
-
+                } else {
                     Predicate predicate = switch (operator) {
                         case "=" -> builder.equal(path, value);
                         case "!=" -> builder.notEqual(path, value);
@@ -97,12 +128,13 @@ public class CarRepository {
                         case ">=" -> builder.greaterThanOrEqualTo(path.as(String.class), value);
                         case "<" -> builder.lessThan(path.as(String.class), value);
                         case "<=" -> builder.lessThanOrEqualTo(path.as(String.class), value);
-                        case "~" -> builder.like(path.as(String.class), value);
-                        case "!~" -> builder.notLike(path.as(String.class), value);
-                        default -> throw new IllegalArgumentException("Некорректный оператор: " + operator);
+                        case "~" -> builder.like(path.as(String.class), "%" + value + "%");
+                        case "!~" -> builder.notLike(path.as(String.class), "%" + value + "%");
+                        default -> throw new IllegalArgumentException("Invalid operator: " + operator);
                     };
                     predicateStack.push(predicate);
                 }
+                i += 3;
             }
         }
 
@@ -122,7 +154,7 @@ public class CarRepository {
         } else if (operator.equalsIgnoreCase("OR")) {
             return builder.or(left, right);
         } else {
-            throw new IllegalArgumentException("Некорректный логический оператор: " + operator);
+            throw new IllegalArgumentException("Invalid logical operator: " + operator);
         }
     }
 

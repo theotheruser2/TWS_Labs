@@ -1,62 +1,16 @@
 package com.tws.lab.command;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tws.lab.soap.Car;
-import com.tws.lab.soap.CarListRequestDto;
-import com.tws.lab.soap.CarWebService;
-import com.tws.lab.utils.Util;
+import com.tws.lab.model.Car;
+import com.tws.lab.rest.CarRestClient;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Scanner;
 
-public class FilterCarCommand implements CliCommand {
-    private final CarWebService carWebService;
-    private final ObjectMapper objectMapper;
+public class FilterCarCommand implements Command {
+    private final CarRestClient carRestClient;
 
-    public FilterCarCommand(CarWebService carWebService, ObjectMapper objectMapper) {
-        this.carWebService = carWebService;
-        this.objectMapper = objectMapper;
-    }
-
-    @Override
-    public void execute(Scanner scanner) {
-        try {
-            System.out.println("Доступные поля и их типы в таблице:");
-            for (Field field : Car.class.getDeclaredFields()) {
-                System.out.println("- " + field.getName() + ": " + field.getType().getSimpleName());
-            }
-            System.out.println("\nИспользуйте операторы AND, OR для объединения нескольких условий, '(', ')' для группировки, а также операторы сравнения: =, >, <, >=, <=\n");
-
-            System.out.print("Введите запрос для фильтрации в формате 'имя_поля оператор значение'\n(например, 'release_year=2018 AND brand=Ford'): ");
-            String query = scanner.nextLine();
-
-            int limit = Util.getIntInput(scanner, "Введите лимит (по умолчанию 5): ", 5);
-            int offset = Util.getIntInput(scanner, "Введите смещение (по умолчанию 0): ", 0);
-
-            CarListRequestDto carListRequestDto = new CarListRequestDto();
-            carListRequestDto.setLimit(limit);
-            carListRequestDto.setOffset(offset);
-            carListRequestDto.setQuery(query);
-
-            List<Car> filteredCars = carWebService.searchCars(carListRequestDto);
-            if (filteredCars.isEmpty()) {
-                System.out.println("Нет автомобилей, соответствующих критериям фильтрации.");
-            } else {
-                System.out.println("\nНайденные автомобили:");
-                System.out.println(String.format("%-10s | %-10s | %-8s | %-15s | %-15s | %-5s",
-                        "ID", "Бренд", "Модель", "Номер", "Телефон владельца", "Год выпуска" ));
-                System.out.println("-".repeat(85));
-
-                for (Car car : filteredCars) {
-                    System.out.println(String.format("%-10d | %-10s | %-8s | %-15s | %-18s | %-5d",
-                            car.getId(), car.getBrand(), car.getModel(), car.getLicensePlate(),
-                            car.getOwnerPhone(), car.getReleaseYear()));
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Ошибка фильтрации: " + e.getMessage());
-        }
+    public FilterCarCommand(CarRestClient carRestClient) {
+        this.carRestClient = carRestClient;
     }
 
     @Override
@@ -67,5 +21,58 @@ public class FilterCarCommand implements CliCommand {
     @Override
     public String getDescription() {
         return "Фильтрация автомобилей на основе запроса с дополнительными параметрами лимита и смещения";
+    }
+
+    @Override
+    public void execute(Scanner scanner) {
+        System.out.println("\nДоступные поля и их типы в таблице:");
+        System.out.println("- brand: String");
+        System.out.println("- id: int");
+        System.out.println("- licensePlate: String");
+        System.out.println("- model: String");
+        System.out.println("- ownerPhone: String");
+        System.out.println("- releaseYear: Integer");
+        
+        System.out.println("\nИспользуйте операторы AND, OR для объединения нескольких условий, '(', ')' для группировки, а также операторы сравнения: =, >, <, >=, <=, ~");
+        
+        System.out.println("\nВведите запрос для фильтрации в формате 'имя_поля оператор значение'");
+        System.out.print("(например, 'release_year=2018 AND brand=Ford'): ");
+        String query = scanner.nextLine().trim();
+        
+        System.out.print("Введите лимит (по умолчанию 5): ");
+        String limitStr = scanner.nextLine().trim();
+        Integer limit = limitStr.isEmpty() ? 5 : Integer.parseInt(limitStr);
+        
+        System.out.print("Введите смещение (по умолчанию 0): ");
+        String offsetStr = scanner.nextLine().trim();
+        Integer offset = offsetStr.isEmpty() ? 0 : Integer.parseInt(offsetStr);
+
+        List<Car> cars = carRestClient.searchCars(query, limit, offset);
+        
+        if (cars.isEmpty()) {
+            System.out.println("Автомобили не найдены.");
+            return;
+        }
+
+        // Print header
+        System.out.println("\nНайденные автомобили:");
+        System.out.println("ID         | Бренд      | Модель   | Номер           | Телефон владельца | Год выпуска");
+        System.out.println("-------------------------------------------------------------------------------------");
+        
+        // Print each car
+        for (Car car : cars) {
+            System.out.printf("%-10d | %-10s | %-8s | %-14s | %-16s | %d%n",
+                car.getId(),
+                truncate(car.getBrand(), 10),
+                truncate(car.getModel(), 8),
+                truncate(car.getLicensePlate() != null ? car.getLicensePlate() : "Н/Д", 14),
+                truncate(car.getOwnerPhone() != null ? car.getOwnerPhone() : "Н/Д", 16),
+                car.getReleaseYear());
+        }
+    }
+
+    private String truncate(String str, int maxLength) {
+        if (str == null) return "";
+        return str.length() <= maxLength ? str : str.substring(0, maxLength - 3) + "...";
     }
 }
