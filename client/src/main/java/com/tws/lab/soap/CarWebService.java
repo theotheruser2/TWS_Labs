@@ -51,6 +51,21 @@ public interface CarWebService {
 
     /**
      * 
+     * @param id
+     * @return
+     *     returns boolean
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "deleteCarById", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarById")
+    @ResponseWrapper(localName = "deleteCarByIdResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarByIdResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/deleteCarByIdRequest", output = "http://soap.lab.tws.com/CarWebService/deleteCarByIdResponse")
+    public boolean deleteCarById(
+        @WebParam(name = "id", targetNamespace = "")
+        int id);
+
+    /**
+     * 
      * @param carDto
      * @return
      *     returns int
@@ -91,18 +106,26 @@ public interface CarWebService {
 
     /**
      * 
+     * @param imageBase64
      * @param id
      * @return
      *     returns boolean
+     * @throws CarCrudException_Exception
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "deleteCarById", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarById")
-    @ResponseWrapper(localName = "deleteCarByIdResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DeleteCarByIdResponse")
-    @Action(input = "http://soap.lab.tws.com/CarWebService/deleteCarByIdRequest", output = "http://soap.lab.tws.com/CarWebService/deleteCarByIdResponse")
-    public boolean deleteCarById(
+    @RequestWrapper(localName = "uploadCarImage", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.UploadCarImage")
+    @ResponseWrapper(localName = "uploadCarImageResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.UploadCarImageResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/uploadCarImageRequest", output = "http://soap.lab.tws.com/CarWebService/uploadCarImageResponse", fault = {
+        @FaultAction(className = CarCrudException_Exception.class, value = "http://soap.lab.tws.com/CarWebService/uploadCarImage/Fault/CarCrudException")
+    })
+    public boolean uploadCarImage(
         @WebParam(name = "id", targetNamespace = "")
-        int id);
+        int id,
+        @WebParam(name = "imageBase64", targetNamespace = "")
+        String imageBase64)
+        throws CarCrudException_Exception
+    ;
 
     /**
      * 
@@ -118,5 +141,25 @@ public interface CarWebService {
     public Car findCarById(
         @WebParam(name = "id", targetNamespace = "")
         int id);
+
+    /**
+     * 
+     * @param id
+     * @return
+     *     returns java.lang.String
+     * @throws CarCrudException_Exception
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "downloadCarImage", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DownloadCarImage")
+    @ResponseWrapper(localName = "downloadCarImageResponse", targetNamespace = "http://soap.lab.tws.com/", className = "com.tws.lab.soap.DownloadCarImageResponse")
+    @Action(input = "http://soap.lab.tws.com/CarWebService/downloadCarImageRequest", output = "http://soap.lab.tws.com/CarWebService/downloadCarImageResponse", fault = {
+        @FaultAction(className = CarCrudException_Exception.class, value = "http://soap.lab.tws.com/CarWebService/downloadCarImage/Fault/CarCrudException")
+    })
+    public String downloadCarImage(
+        @WebParam(name = "id", targetNamespace = "")
+        int id)
+        throws CarCrudException_Exception
+    ;
 
 }

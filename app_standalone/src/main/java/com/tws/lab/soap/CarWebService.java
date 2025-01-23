@@ -54,4 +54,26 @@ public class CarWebService {
     public boolean deleteCarById(@WebParam(name = "id") int id) {
         return carService.deleteCarById(id);
     }
+
+    @WebMethod
+    public boolean uploadCarImage(@WebParam(name = "id") int id, @WebParam(name = "imageBase64") String imageBase64) throws CarCrudException {
+        Car car = carService.readCar(id);
+        if (car == null) {
+            throw new CarCrudException("Автомобиль не найден", new ErrorBean("Не найдена запись с идентификатором: " + id));
+        }
+        return carService.updateCarImage(id, imageBase64);
+    }
+
+    @WebMethod
+    public String downloadCarImage(@WebParam(name = "id") int id) throws CarCrudException {
+        Car car = carService.readCar(id);
+        if (car == null) {
+            throw new CarCrudException("Автомобиль не найден", new ErrorBean("Не найдена запись с идентификатором: " + id));
+        }
+        String image = car.getImage();
+        if (image == null || image.isEmpty()) {
+            throw new CarCrudException("Изображение не найдено", new ErrorBean("У автомобиля с ID " + id + " нет изображения"));
+        }
+        return image;
+    }
 }

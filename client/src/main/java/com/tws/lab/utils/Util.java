@@ -104,6 +104,12 @@ public class Util {
         DeleteCarCommand deleteCarCommand = new DeleteCarCommand(carWebServiceProxy);
         commands.put(deleteCarCommand.getName(), deleteCarCommand);
 
+        UploadImageCommand uploadImageCommand = new UploadImageCommand(carWebServiceProxy);
+        commands.put(uploadImageCommand.getName(), uploadImageCommand);
+
+        DownloadImageCommand downloadImageCommand = new DownloadImageCommand(carWebServiceProxy);
+        commands.put(downloadImageCommand.getName(), downloadImageCommand);
+
         HelpCommand helpCommand = new HelpCommand(commands);
         commands.put(helpCommand.getName(), helpCommand);
 

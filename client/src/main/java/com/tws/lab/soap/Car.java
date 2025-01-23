@@ -19,6 +19,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *       &lt;sequence&gt;
  *         &lt;element name="brand" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/&gt;
+ *         &lt;element name="image" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="license_plate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="model" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="owner_phone" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
@@ -35,6 +36,7 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "car", propOrder = {
     "brand",
     "id",
+    "image",
     "licensePlate",
     "model",
     "ownerPhone",
@@ -44,6 +46,7 @@ public class Car {
 
     protected String brand;
     protected int id;
+    protected String image;
     @XmlElement(name = "license_plate")
     protected String licensePlate;
     protected String model;
@@ -90,6 +93,30 @@ public class Car {
      */
     public void setId(int value) {
         this.id = value;
+    }
+
+    /**
+     * Gets the value of the image property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getImage() {
+        return image;
+    }
+
+    /**
+     * Sets the value of the image property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setImage(String value) {
+        this.image = value;
     }
 
     /**

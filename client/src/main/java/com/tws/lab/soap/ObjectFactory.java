@@ -29,12 +29,16 @@ public class ObjectFactory {
     private final static QName _CreateCarResponse_QNAME = new QName("http://soap.lab.tws.com/", "createCarResponse");
     private final static QName _DeleteCarById_QNAME = new QName("http://soap.lab.tws.com/", "deleteCarById");
     private final static QName _DeleteCarByIdResponse_QNAME = new QName("http://soap.lab.tws.com/", "deleteCarByIdResponse");
+    private final static QName _DownloadCarImage_QNAME = new QName("http://soap.lab.tws.com/", "downloadCarImage");
+    private final static QName _DownloadCarImageResponse_QNAME = new QName("http://soap.lab.tws.com/", "downloadCarImageResponse");
     private final static QName _FindCarById_QNAME = new QName("http://soap.lab.tws.com/", "findCarById");
     private final static QName _FindCarByIdResponse_QNAME = new QName("http://soap.lab.tws.com/", "findCarByIdResponse");
     private final static QName _SearchCars_QNAME = new QName("http://soap.lab.tws.com/", "searchCars");
     private final static QName _SearchCarsResponse_QNAME = new QName("http://soap.lab.tws.com/", "searchCarsResponse");
     private final static QName _UpdateCar_QNAME = new QName("http://soap.lab.tws.com/", "updateCar");
     private final static QName _UpdateCarResponse_QNAME = new QName("http://soap.lab.tws.com/", "updateCarResponse");
+    private final static QName _UploadCarImage_QNAME = new QName("http://soap.lab.tws.com/", "uploadCarImage");
+    private final static QName _UploadCarImageResponse_QNAME = new QName("http://soap.lab.tws.com/", "uploadCarImageResponse");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.tws.lab.soap
@@ -81,6 +85,22 @@ public class ObjectFactory {
      */
     public DeleteCarByIdResponse createDeleteCarByIdResponse() {
         return new DeleteCarByIdResponse();
+    }
+
+    /**
+     * Create an instance of {@link DownloadCarImage }
+     * 
+     */
+    public DownloadCarImage createDownloadCarImage() {
+        return new DownloadCarImage();
+    }
+
+    /**
+     * Create an instance of {@link DownloadCarImageResponse }
+     * 
+     */
+    public DownloadCarImageResponse createDownloadCarImageResponse() {
+        return new DownloadCarImageResponse();
     }
 
     /**
@@ -132,6 +152,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link UploadCarImage }
+     * 
+     */
+    public UploadCarImage createUploadCarImage() {
+        return new UploadCarImage();
+    }
+
+    /**
+     * Create an instance of {@link UploadCarImageResponse }
+     * 
+     */
+    public UploadCarImageResponse createUploadCarImageResponse() {
+        return new UploadCarImageResponse();
+    }
+
+    /**
      * Create an instance of {@link Car }
      * 
      */
@@ -140,19 +176,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CarDto }
-     * 
-     */
-    public CarDto createCarDto() {
-        return new CarDto();
-    }
-
-    /**
      * Create an instance of {@link ErrorBean }
      * 
      */
     public ErrorBean createErrorBean() {
         return new ErrorBean();
+    }
+
+    /**
+     * Create an instance of {@link CarDto }
+     * 
+     */
+    public CarDto createCarDto() {
+        return new CarDto();
     }
 
     /**
@@ -226,6 +262,32 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "deleteCarByIdResponse")
     public JAXBElement<DeleteCarByIdResponse> createDeleteCarByIdResponse(DeleteCarByIdResponse value) {
         return new JAXBElement<DeleteCarByIdResponse>(_DeleteCarByIdResponse_QNAME, DeleteCarByIdResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DownloadCarImage }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link DownloadCarImage }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "downloadCarImage")
+    public JAXBElement<DownloadCarImage> createDownloadCarImage(DownloadCarImage value) {
+        return new JAXBElement<DownloadCarImage>(_DownloadCarImage_QNAME, DownloadCarImage.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DownloadCarImageResponse }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link DownloadCarImageResponse }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "downloadCarImageResponse")
+    public JAXBElement<DownloadCarImageResponse> createDownloadCarImageResponse(DownloadCarImageResponse value) {
+        return new JAXBElement<DownloadCarImageResponse>(_DownloadCarImageResponse_QNAME, DownloadCarImageResponse.class, null, value);
     }
 
     /**
@@ -304,6 +366,32 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "updateCarResponse")
     public JAXBElement<UpdateCarResponse> createUpdateCarResponse(UpdateCarResponse value) {
         return new JAXBElement<UpdateCarResponse>(_UpdateCarResponse_QNAME, UpdateCarResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link UploadCarImage }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UploadCarImage }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "uploadCarImage")
+    public JAXBElement<UploadCarImage> createUploadCarImage(UploadCarImage value) {
+        return new JAXBElement<UploadCarImage>(_UploadCarImage_QNAME, UploadCarImage.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link UploadCarImageResponse }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UploadCarImageResponse }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://soap.lab.tws.com/", name = "uploadCarImageResponse")
+    public JAXBElement<UploadCarImageResponse> createUploadCarImageResponse(UploadCarImageResponse value) {
+        return new JAXBElement<UploadCarImageResponse>(_UploadCarImageResponse_QNAME, UploadCarImageResponse.class, null, value);
     }
 
 }

@@ -32,4 +32,12 @@ public class CarService {
     public boolean deleteCarById(int id) {
         return carRepository.deleteCarById(id);
     }
+    public boolean updateCarImage(int id, String imageBase64) {
+        Car car = carRepository.readCar(id);
+        if (car != null) {
+            car.setImage(imageBase64);
+            return carRepository.updateCar(id, car);
+        }
+        return false;
+    }
 }

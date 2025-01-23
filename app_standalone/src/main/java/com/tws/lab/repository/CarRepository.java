@@ -65,11 +65,20 @@ public class CarRepository {
             if (existingCar == null) {
                 return false;
             }
+            String existingImage = existingCar.getImage();
+            
             existingCar.setBrand(newDetails.getBrand());
             existingCar.setModel(newDetails.getModel());
             existingCar.setRelease_year(newDetails.getRelease_year());
             existingCar.setLicense_plate(newDetails.getLicense_plate());
             existingCar.setOwner_phone(newDetails.getOwner_phone());
+            
+            if (newDetails.getImage() != null) {
+                existingCar.setImage(newDetails.getImage());
+            } else {
+                existingCar.setImage(existingImage);
+            }
+            
             entityManager.getTransaction().commit();
             return true;
         }
