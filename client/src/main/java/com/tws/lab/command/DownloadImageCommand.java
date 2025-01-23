@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class DownloadImageCommand implements CliCommand {
     private final CarWebService carWebService;
-    private static final String IMAGES_DIR = "client/images";
+    private static final String IMAGES_DIR = "images";
 
     public DownloadImageCommand(CarWebService carWebService) {
         this.carWebService = carWebService;
