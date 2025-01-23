@@ -35,4 +35,38 @@ public class CarController {
         List<Car> cars = carService.searchCars(requestDto.getQuery(), limit, offset);
         return ResponseEntity.ok(cars);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Car> findById(@PathVariable Integer id) {
+        return carService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Car> create(@RequestBody Car car) {
+        Car savedCar = carService.save(car);
+        return ResponseEntity.ok(savedCar);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Car> update(@PathVariable Integer id, @RequestBody Car car) {
+        return carService.findById(id)
+                .map(existingCar -> {
+                    car.setId(id);
+                    Car updatedCar = carService.save(car);
+                    return ResponseEntity.ok(updatedCar);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        return carService.findById(id)
+                .map(car -> {
+                    carService.delete(id);
+                    return ResponseEntity.ok().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 } 

@@ -30,6 +30,10 @@ public class CliRestClientApp {
                 System.out.println("1) help - Показать список доступных команд");
                 System.out.println("2) exit - Выход из приложения");
                 System.out.println("3) search - Фильтрация автомобилей на основе запроса с дополнительными параметрами лимита и смещения");
+                System.out.println("4) findById - Поиск автомобиля по ID");
+                System.out.println("5) create - Создание новой записи об автомобиле");
+                System.out.println("6) update - Обновление записи об автомобиле по ID");
+                System.out.println("7) delete - Удаление записи об автомобиле по ID");
             }
         });
 
@@ -51,7 +55,11 @@ public class CliRestClientApp {
                 continue;
             }
 
-            command.execute(scanner);
+            try {
+                command.execute(scanner);
+            } catch (Exception e) {
+                System.err.println("Ошибка при выполнении команды: " + e.getMessage());
+            }
         }
     }
 } 

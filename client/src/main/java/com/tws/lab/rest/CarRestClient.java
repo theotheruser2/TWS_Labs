@@ -62,7 +62,59 @@ public class CarRestClient {
             return response != null ? Arrays.asList(response) : Collections.emptyList();
         } catch (RestClientException e) {
             System.err.println("Error searching cars: " + e.getMessage());
-            return Collections.emptyList();
+        }
+        return Collections.emptyList();
+    }
+
+    public Car findById(Integer id) {
+        try {
+            ResponseEntity<Car> response = restTemplate.getForEntity(
+                    baseUrl + "/api/cars/" + id,
+                    Car.class
+            );
+            return response.getBody();
+        } catch (RestClientException e) {
+            System.err.println("Error finding car by ID: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Car create(Car car) {
+        try {
+            ResponseEntity<Car> response = restTemplate.postForEntity(
+                    baseUrl + "/api/cars",
+                    car,
+                    Car.class
+            );
+            return response.getBody();
+        } catch (RestClientException e) {
+            System.err.println("Error creating car: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Car update(Integer id, Car car) {
+        try {
+            ResponseEntity<Car> response = restTemplate.exchange(
+                    baseUrl + "/api/cars/" + id,
+                    HttpMethod.PUT,
+                    new org.springframework.http.HttpEntity<>(car),
+                    Car.class
+            );
+            return response.getBody();
+        } catch (RestClientException e) {
+            System.err.println("Error updating car: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public boolean delete(Integer id) {
+        try {
+            restTemplate.delete(baseUrl + "/api/cars/" + id);
+            return true;
+        } catch (RestClientException e) {
+            System.err.println("Error deleting car: " + e.getMessage());
+            return false;
         }
     }
 } 

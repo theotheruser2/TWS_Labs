@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import com.tws.lab.model.entity.Car;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Stack;
@@ -28,6 +29,28 @@ public class CarRepository {
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
+    }
+
+    public Car findById(Integer id) {
+        return entityManager.find(Car.class, id);
+    }
+
+    @Transactional
+    public Car save(Car car) {
+        if (car.getId() == null) {
+            entityManager.persist(car);
+            return car;
+        } else {
+            return entityManager.merge(car);
+        }
+    }
+
+    @Transactional
+    public void deleteById(Integer id) {
+        Car car = findById(id);
+        if (car != null) {
+            entityManager.remove(car);
+        }
     }
 
     private Predicate parseQueryToPredicate(String query, CriteriaBuilder builder, Root<Car> root) {

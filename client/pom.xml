@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.ifmo.ru</groupId>
-    <artifactId>tws4-client</artifactId>
+    <artifactId>tws5-client</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -42,7 +42,7 @@
     </dependencies>
 
     <build>
-        <finalName>tws4-client</finalName>
+        <finalName>tws5-client</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -55,7 +55,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>tws4-client</finalName>
+                    <finalName>tws5-client</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
