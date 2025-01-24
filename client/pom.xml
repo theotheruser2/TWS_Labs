@@ -9,111 +9,147 @@
     <version>1.0.0</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.xml.ws-api.version>4.0.0</jakarta.xml.ws-api.version>
-        <jaxws-rt.version>4.0.1</jaxws-rt.version>
-        <jaxws-ri.version>4.0.1</jaxws-ri.version>
-        <jaxws-maven-plugin.version>3.0.0</jaxws-maven-plugin.version>
-        <lombok.version>1.18.34</lombok.version>
+        <juddi.version>3.3.9</juddi.version>
     </properties>
+
     <dependencies>
+        <!-- jUDDI -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <groupId>org.apache.juddi</groupId>
+            <artifactId>juddi-client</artifactId>
+            <version>${juddi.version}</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.xml.ws</groupId>
-            <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>${jakarta.xml.ws-api.version}</version>
+            <groupId>org.apache.juddi</groupId>
+            <artifactId>uddi-ws</artifactId>
+            <version>${juddi.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.14.1</version>
-        </dependency>
+
+        <!-- JAXB and JAX-WS -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
-            <version>${jaxws-rt.version}</version>
-            <scope>runtime</scope>
+            <version>2.3.5</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-ri</artifactId>
-            <version>${jaxws-ri.version}</version>
-            <type>pom</type>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>3.0.1</version>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>3.0.1</version>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.0</version>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>2.3.0.1</version>
+        </dependency>
+
+        <!-- Java Activation Framework -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <!-- GlassFish Management API -->
+        <dependency>
+            <groupId>org.glassfish.gmbal</groupId>
+            <artifactId>gmbal-api-only</artifactId>
+            <version>3.2.0-b003</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.gmbal</groupId>
+            <artifactId>gmbal</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <!-- StAX Extensions -->
+        <dependency>
+            <groupId>org.jvnet.staxex</groupId>
+            <artifactId>stax-ex</artifactId>
+            <version>1.8.3</version>
+        </dependency>
+
+        <!-- Jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.12.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.12.7</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- XML Resolver -->
+        <dependency>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>tws6-client</finalName>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.tws.lab.CliSoapClientApp</mainClass>
-                        </manifest>
-                        <manifestEntries>
-                            <Multi-Release>true</Multi-Release>
-                        </manifestEntries>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>tws3-client</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.tws.lab.CliSoapClientApp</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/uddi.xml</resource>
+                                </transformer>
+                            </transformers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-maven-plugin</artifactId>
-                <version>${jaxws-maven-plugin.version}</version>
+                <version>2.3.5</version>
                 <executions>
                     <execution>
                         <goals>
@@ -123,30 +159,16 @@
                 </executions>
                 <configuration>
                     <wsdlUrls>
-                        <wsdlUrl>http://localhost:8080/CarService?wsdl</wsdlUrl>
+                        <wsdlUrl>http://localhost:8081/CarService?wsdl</wsdlUrl>
                     </wsdlUrls>
-                    <verbose>true</verbose>
                     <sourceDestDir>${basedir}/src/main/java</sourceDestDir>
+                    <packageName>com.tws.lab.soap</packageName>
+                    <wsdlLocation>http://localhost:8081/CarService?wsdl</wsdlLocation>
+                    <keep>true</keep>
                     <extension>true</extension>
+                    <xnocompile>true</xnocompile>
+                    <verbose>true</verbose>
                 </configuration>
-                <dependencies>
-                    <!-- JAXB API and Runtime for wsimport -->
-                    <dependency>
-                        <groupId>jakarta.xml.bind</groupId>
-                        <artifactId>jakarta.xml.bind-api</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId>jaxb-runtime</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.sun.xml.bind</groupId>
-                        <artifactId>jaxb-xjc</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uddi xmlns="urn:juddi-apache-org:v3_client" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:juddi-apache-org:v3_client uddi-client-config.xsd">
+    <reloadDelay>5000</reloadDelay>
+    <client name="default">
+        <nodes>
+            <node>
+                <name>default</name>
+                <description>Main jUDDI node</description>
+                <properties>
+                    <property name="serverName" value="localhost"/>
+                    <property name="serverPort" value="8080"/>
+                </properties>
+                <proxyTransport>org.apache.juddi.v3.client.transport.JAXWSTransport</proxyTransport>
+                <custodyTransferUrl>http://${serverName}:${serverPort}/juddiv3/services/custody-transfer?wsdl</custodyTransferUrl>
+                <inquiryUrl>http://${serverName}:${serverPort}/juddiv3/services/inquiry?wsdl</inquiryUrl>
+                <publishUrl>http://${serverName}:${serverPort}/juddiv3/services/publish?wsdl</publishUrl>
+                <securityUrl>http://${serverName}:${serverPort}/juddiv3/services/security?wsdl</securityUrl>
+                <subscriptionUrl>http://${serverName}:${serverPort}/juddiv3/services/subscription?wsdl</subscriptionUrl>
+                <subscriptionListenerUrl>http://${serverName}:${serverPort}/juddiv3/services/subscription-listener?wsdl</subscriptionListenerUrl>
+                <juddiApiUrl>http://${serverName}:${serverPort}/juddiv3/services/juddi-api?wsdl</juddiApiUrl>
+            </node>
+        </nodes>
+    </client>
+</uddi> 

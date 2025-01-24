@@ -40,14 +40,27 @@ public class Util {
             field.setAccessible(true);
             String fieldName = field.getName();
             String fieldType = field.getType().getSimpleName();
-            String userFriendlyName = switch (fieldName) {
-                case "brand" -> "Марка";
-                case "model" -> "Модель";
-                case "releaseYear" -> "Год выпуска";
-                case "licensePlate" -> "Регистрационный номер";
-                case "ownerPhone" -> "Телефон владельца";
-                default -> fieldName;
-            };
+            String userFriendlyName;
+            switch (fieldName) {
+                case "brand":
+                    userFriendlyName = "Марка";
+                    break;
+                case "model":
+                    userFriendlyName = "Модель";
+                    break;
+                case "releaseYear":
+                    userFriendlyName = "Год выпуска";
+                    break;
+                case "licensePlate":
+                    userFriendlyName = "Регистрационный номер";
+                    break;
+                case "ownerPhone":
+                    userFriendlyName = "Телефон владельца";
+                    break;
+                default:
+                    userFriendlyName = fieldName;
+                    break;
+            }
 
             while (true) {
                 System.out.print(userFriendlyName + " (" + fieldType + "): ");

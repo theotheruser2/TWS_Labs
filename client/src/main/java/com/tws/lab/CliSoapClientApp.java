@@ -1,80 +1,57 @@
 package com.tws.lab;
 
-import com.tws.lab.command.CliCommand;
-
-import java.util.Map;
-import java.util.Scanner;
-import java.nio.charset.StandardCharsets;
-
-import static com.tws.lab.utils.Util.produceCommands;
+import com.tws.lab.command.*;
+import com.tws.lab.service.JuddiService;
+import java.util.*;
 
 public class CliSoapClientApp {
     public static void main(String[] args) {
-        // Set character encoding properties
-        System.setProperty("file.encoding", "UTF-8");
-        System.setProperty("sun.jnu.encoding", "UTF-8");
-
-        String soapUrl = System.getenv("SOAP_SERVICE_URL");
-        if (args.length > 0) {
-            soapUrl = args[0];
+        if (args.length != 2) {
+            System.err.println("Использование: java -jar client.jar <juddi-url> <service-url>");
+            System.err.println("Пример: java -jar client.jar http://localhost:8080 http://localhost:8080/CarService?wsdl");
+            System.exit(1);
         }
 
-        if (soapUrl == null || soapUrl.isEmpty()) {
-            System.out.println("URL SOAP сервиса должен быть задан через переменную окружения или аргумент командной строки.");
-            return;
-        }
+        String juddiUrl = args[0];
+        String serviceUrl = args[1];
 
         try {
-            Map<String, CliCommand> commands = produceCommands(soapUrl);
-            Scanner scanner = new Scanner(System.in, StandardCharsets.UTF_8);
+            JuddiService juddiService = new JuddiService(juddiUrl);
+            Map<String, CliCommand> commands = new HashMap<>();
 
-            System.out.println("Для получения списка доступных команд используйте 'help'.");
+            // Add jUDDI commands
+            commands.put("register", new RegisterServiceCommand(juddiService, serviceUrl));
+            commands.put("find", new FindServiceCommand(juddiService));
 
+            Scanner scanner = new Scanner(System.in);
             while (true) {
-                System.out.print("Введите команду: ");
-                String input = scanner.nextLine();
-                if (input.equalsIgnoreCase("clear")) {
-                    clearConsole();
+                System.out.println("\nДоступные команды:");
+                System.out.println("1) help - показать список команд");
+                System.out.println("2) exit - выйти");
+                System.out.println("3) find - Поиск сервиса в реестре jUDDI");
+                System.out.println("4) register - Регистрация сервиса в реестре jUDDI");
+
+                System.out.print("\nВведите команду: ");
+                String input = scanner.nextLine().trim().toLowerCase();
+
+                if (input.equals("exit")) {
+                    break;
+                }
+
+                if (input.equals("help")) {
                     continue;
                 }
-                CliCommand command = null;
-                try {
-                    int commandIndex = Integer.parseInt(input);
-                    if (commandIndex > 0 && commandIndex <= commands.size()) {
-                        command = (CliCommand) commands.values().toArray()[commandIndex - 1];
-                    }
-                } catch (NumberFormatException e) {
-                    command = commands.get(input);
-                }
 
+                CliCommand command = commands.get(input);
                 if (command != null) {
-                    try {
-                        command.execute(scanner);
-                    } catch (Exception e) {
-                        System.out.println("Не удалось выполнить команду. SOAP сервис недоступен.");
-                    }
+                    command.execute(scanner);
                 } else {
-                    System.out.println("Неизвестная команда. Введите 'help' для списка доступных команд.");
+                    System.out.println("Неизвестная команда. Используйте 'help' для списка команд.");
                 }
-
-                System.out.println();
             }
         } catch (Exception e) {
-            System.out.println(e);
-            System.out.println("SOAP сервис не смог инициализироваться. Команды недоступны.");
-        }
-    }
-
-    private static void clearConsole() {
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-            }
-        } catch (Exception e) {
-            System.out.println("Не удалось очистить консоль.");
+            System.err.println("Ошибка: " + e.getMessage());
+            System.exit(1);
         }
     }
 }

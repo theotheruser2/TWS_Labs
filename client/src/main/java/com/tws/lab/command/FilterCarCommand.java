@@ -47,7 +47,8 @@ public class FilterCarCommand implements CliCommand {
                 System.out.println("\nНайденные автомобили:");
                 System.out.println(String.format("%-10s | %-10s | %-8s | %-15s | %-15s | %-5s",
                         "ID", "Бренд", "Модель", "Номер", "Телефон владельца", "Год выпуска" ));
-                System.out.println("-".repeat(85));
+                String line = new String(new char[85]).replace('\0', '-');
+                System.out.println(line);
 
                 for (Car car : filteredCars) {
                     System.out.println(String.format("%-10d | %-10s | %-8s | %-15s | %-17s | %-5d",
