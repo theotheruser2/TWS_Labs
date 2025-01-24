@@ -2,6 +2,9 @@ package com.tws.lab.command;
 
 import com.tws.lab.model.Car;
 import com.tws.lab.rest.CarRestClient;
+import com.tws.lab.rest.error.RestClientException;
+import com.tws.lab.util.InputValidator;
+import com.tws.lab.util.InputValidator.ExitCommandException;
 import com.tws.lab.util.Util;
 
 import java.util.Scanner;
@@ -25,23 +28,27 @@ public class UpdateCarCommand implements Command {
 
     @Override
     public void execute(Scanner scanner) {
-        System.out.print("Введите идентификатор автомобиля для обновления записи: ");
-        int id = Integer.parseInt(scanner.nextLine().trim());
+        try {
+            int id = InputValidator.readIntegerOrExit(scanner, 
+                "Введите идентификатор автомобиля для обновления записи (или введите 'exit' для выхода): ");
 
-        Car existingCar = carRestClient.findById(id);
-        if (existingCar != null) {
-            System.out.println("Автомобиль найден. Введите новые данные для обновления записи.");
-            System.out.println("Введите данные об автомобиле:");
-            Car updatedCar = Util.readCarFromConsole(scanner);
-            updatedCar.setId(id);
-            Car result = carRestClient.update(id, updatedCar);
-            if (result != null) {
-                System.out.println("Запись успешно обновлена.");
+            Car existingCar = carRestClient.findById(id);
+            if (existingCar != null) {
+                System.out.println("Автомобиль найден. Введите новые данные для обновления записи.");
+                System.out.println("Введите данные об автомобиле.");
+                Car updatedCar = Util.readCarFromConsole(scanner);
+                updatedCar.setId(id);
+                Car result = carRestClient.update(id, updatedCar);
+                if (result != null) {
+                    System.out.println("Запись успешно обновлена.");
+                }
             } else {
-                System.out.println("Ошибка при обновлении записи.");
+                System.out.println("Автомобиль с ID №" + id + " не найден.");
             }
-        } else {
-            System.out.println("Автомобиль с ID №" + id + " не найден.");
+        } catch (ExitCommandException e) {
+            System.out.println("Выход из команды обновления записи об автомобиле.");
+        } catch (RestClientException e) {
+            System.err.println(e.getMessage());
         }
     }
 } 

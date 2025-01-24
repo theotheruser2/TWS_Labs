@@ -1,9 +1,11 @@
 package com.tws.lab.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tws.lab.model.Car;
+import com.tws.lab.rest.error.RestClientException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URLEncoder;
@@ -15,6 +17,7 @@ import java.util.List;
 public class CarRestClient {
     private final String baseUrl;
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     public CarRestClient(String baseUrl) {
         // Remove trailing slash if present
@@ -23,6 +26,7 @@ public class CarRestClient {
         }
         this.baseUrl = baseUrl;
         this.restTemplate = new RestTemplate();
+        this.objectMapper = new ObjectMapper();
     }
 
     public List<Car> searchCars(String query, int limit, int offset) {
@@ -60,10 +64,12 @@ public class CarRestClient {
             System.out.println("Requesting URL: " + url);
             Car[] response = restTemplate.getForObject(url, Car[].class);
             return response != null ? Arrays.asList(response) : Collections.emptyList();
-        } catch (RestClientException e) {
-            System.err.println("Error searching cars: " + e.getMessage());
+        } catch (HttpClientErrorException e) {
+            String errorMessage = extractErrorMessage(e);
+            throw new RestClientException("Ошибка при поиске записей об автомобиле: " + errorMessage);
+        } catch (Exception e) {
+            throw new RestClientException("Ошибка при поиске записей об автомобиле: " + e.getMessage());
         }
-        return Collections.emptyList();
     }
 
     public Car findById(Integer id) {
@@ -73,9 +79,14 @@ public class CarRestClient {
                     Car.class
             );
             return response.getBody();
-        } catch (RestClientException e) {
-            System.err.println("Error finding car by ID: " + e.getMessage());
-            return null;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 404) {
+                return null;
+            }
+            String errorMessage = extractErrorMessage(e);
+            throw new RestClientException("Ошибка при поиске автомобиля: " + errorMessage);
+        } catch (Exception e) {
+            throw new RestClientException("Ошибка при поиске автомобиля: " + e.getMessage());
         }
     }
 
@@ -87,9 +98,11 @@ public class CarRestClient {
                     Car.class
             );
             return response.getBody();
-        } catch (RestClientException e) {
-            System.err.println("Error creating car: " + e.getMessage());
-            return null;
+        } catch (HttpClientErrorException e) {
+            String errorMessage = extractErrorMessage(e);
+            throw new RestClientException("Ошибка при создании записи об автомобиле: " + errorMessage);
+        } catch (Exception e) {
+            throw new RestClientException("Ошибка при создании записи об автомобиле: " + e.getMessage());
         }
     }
 
@@ -102,9 +115,11 @@ public class CarRestClient {
                     Car.class
             );
             return response.getBody();
-        } catch (RestClientException e) {
-            System.err.println("Error updating car: " + e.getMessage());
-            return null;
+        } catch (HttpClientErrorException e) {
+            String errorMessage = extractErrorMessage(e);
+            throw new RestClientException("Ошибка при обновлении записи об автомобиле: " + errorMessage);
+        } catch (Exception e) {
+            throw new RestClientException("Ошибка при обновлении записи об автомобиле: " + e.getMessage());
         }
     }
 
@@ -112,9 +127,54 @@ public class CarRestClient {
         try {
             restTemplate.delete(baseUrl + "/api/cars/" + id);
             return true;
-        } catch (RestClientException e) {
-            System.err.println("Error deleting car: " + e.getMessage());
-            return false;
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 404) {
+                return false;
+            }
+            String errorMessage = extractErrorMessage(e);
+            throw new RestClientException("Ошибка при удалении записи об автомобиле: " + errorMessage);
+        } catch (Exception e) {
+            throw new RestClientException("Ошибка при удалении записи об автомобиле: " + e.getMessage());
+        }
+    }
+
+    private String extractErrorMessage(HttpClientErrorException e) {
+        try {
+            ErrorResponse error = objectMapper.readValue(e.getResponseBodyAsString(), ErrorResponse.class);
+            if (error.getMessage() != null && error.getDetails() != null) {
+                return error.getMessage() + "." + error.getDetails();
+            } else if (error.getMessage() != null) {
+                return error.getMessage();
+            } else if (error.getDetails() != null) {
+                return error.getDetails();
+            }
+            return "Неизвестная ошибка";
+        } catch (Exception ex) {
+            if (e.getStatusCode().value() == 404) {
+                return "Запись не найдена";
+            }
+            return e.getMessage();
+        }
+    }
+
+    private static class ErrorResponse {
+        private String message;
+        private String details;
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getDetails() {
+            return details;
+        }
+
+        public void setDetails(String details) {
+            this.details = details;
         }
     }
 } 

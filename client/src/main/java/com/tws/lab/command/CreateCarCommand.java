@@ -2,6 +2,7 @@ package com.tws.lab.command;
 
 import com.tws.lab.model.Car;
 import com.tws.lab.rest.CarRestClient;
+import com.tws.lab.rest.error.RestClientException;
 import com.tws.lab.util.Util;
 
 import java.util.Scanner;
@@ -25,13 +26,15 @@ public class CreateCarCommand implements Command {
 
     @Override
     public void execute(Scanner scanner) {
-        System.out.println("Введите данные об автомобиле:");
-        Car car = Util.readCarFromConsole(scanner);
-        Car createdCar = carRestClient.create(car);
-        if (createdCar != null) {
-            System.out.println("Создание записи об автомобиле с ID: " + createdCar.getId());
-        } else {
-            System.out.println("Ошибка при создании записи об автомобиле.");
+        try {
+            System.out.println("Введите данные об автомобиле.");
+            Car car = Util.readCarFromConsole(scanner);
+            Car createdCar = carRestClient.create(car);
+            if (createdCar != null) {
+                System.out.println("Создание записи об автомобиле с ID: " + createdCar.getId());
+            }
+        } catch (RestClientException e) {
+            System.err.println(e.getMessage());
         }
     }
 } 

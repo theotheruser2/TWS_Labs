@@ -34,20 +34,36 @@ public class Util {
     }
 
     public static Car readCarFromConsole(java.util.Scanner scanner) {
-        System.out.print("Марка: ");
+        System.out.print("Марка (String): ");
         String brand = scanner.nextLine().trim();
 
-        System.out.print("Модель: ");
-        String model = scanner.nextLine().trim();
-
-        System.out.print("Год выпуска: ");
-        int releaseYear = Integer.parseInt(scanner.nextLine().trim());
-
-        System.out.print("Регистрационный номер: ");
+        System.out.print("Регистрационный номер (String): ");
         String licensePlate = scanner.nextLine().trim();
 
-        System.out.print("Телефон владельца: ");
+        System.out.print("Модель (String): ");
+        String model = scanner.nextLine().trim();
+
+        System.out.print("Телефон владельца (String): ");
         String ownerPhone = scanner.nextLine().trim();
+
+        Integer releaseYear = null;
+        while (releaseYear == null) {
+            System.out.print("Год выпуска (Integer): ");
+            String input = scanner.nextLine().trim();
+            try {
+                if (!input.isEmpty()) {
+                    releaseYear = Integer.parseInt(input);
+                    if (releaseYear < 1885) {
+                        System.out.println("Ошибка ввода: Год выпуска не может быть ранее 1885.");
+                        releaseYear = null;
+                    }
+                } else {
+                    System.out.println("Ошибка: Введите корректное число.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Введите корректное число.");
+            }
+        }
 
         Car car = new Car();
         car.setBrand(brand);
