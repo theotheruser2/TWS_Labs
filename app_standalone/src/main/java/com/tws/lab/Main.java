@@ -4,6 +4,7 @@ import com.tws.lab.repository.EntityManagerFactoryProvider;
 import com.tws.lab.repository.CarRepository;
 import com.tws.lab.service.CarService;
 import com.tws.lab.soap.CarWebService;
+import com.tws.lab.soap.config.WebServiceConfig;
 
 import jakarta.xml.ws.Endpoint;
 
@@ -33,7 +34,9 @@ public class Main {
         CarService carService = new CarService(carRepository);
 
         String url = env.getOrDefault("SOAP_SERVICE_URL", "http://localhost:8080/CarService");
-        Endpoint.publish(url, new CarWebService(carService));
+        Endpoint endpoint = Endpoint.create(new CarWebService(carService));
+        WebServiceConfig.configureHandlers(endpoint);
+        endpoint.publish(url);
 
         System.out.println("Сервис запущен.");
     }

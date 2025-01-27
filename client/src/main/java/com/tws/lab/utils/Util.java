@@ -11,8 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.lang.reflect.Field;
 
-import com.tws.lab.soap.CarService;
-import com.tws.lab.soap.CarWebService;
+import com.tws.lab.service.CarClientService;
 import com.tws.lab.command.*;
 import com.tws.lab.soap.CarDto;
 
@@ -85,29 +84,27 @@ public class Util {
         prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
         objectMapper.setDefaultPrettyPrinter(prettyPrinter);
 
-        URL url = new URL(soapUrl);
-        CarService carService = new CarService(url);
-        CarWebService carWebServiceProxy = carService.getCarWebServicePort();
+        CarClientService carClientService = new CarClientService(soapUrl);
 
-        FilterCarCommand filterCarCommand = new FilterCarCommand(carWebServiceProxy, objectMapper);
+        FilterCarCommand filterCarCommand = new FilterCarCommand(carClientService, objectMapper);
         commands.put(filterCarCommand.getName(), filterCarCommand);
 
-        FindCarByIdCommand findCarByIdCommand = new FindCarByIdCommand(carWebServiceProxy, objectMapper);
+        FindCarByIdCommand findCarByIdCommand = new FindCarByIdCommand(carClientService, objectMapper);
         commands.put(findCarByIdCommand.getName(), findCarByIdCommand);
 
-        CreateCarCommand createCarCommand = new CreateCarCommand(carWebServiceProxy);
+        CreateCarCommand createCarCommand = new CreateCarCommand(carClientService);
         commands.put(createCarCommand.getName(), createCarCommand);
 
-        UpdateCarCommand updateCarCommand = new UpdateCarCommand(carWebServiceProxy);
+        UpdateCarCommand updateCarCommand = new UpdateCarCommand(carClientService);
         commands.put(updateCarCommand.getName(), updateCarCommand);
 
-        DeleteCarCommand deleteCarCommand = new DeleteCarCommand(carWebServiceProxy);
+        DeleteCarCommand deleteCarCommand = new DeleteCarCommand(carClientService);
         commands.put(deleteCarCommand.getName(), deleteCarCommand);
 
-        UploadImageCommand uploadImageCommand = new UploadImageCommand(carWebServiceProxy);
+        UploadImageCommand uploadImageCommand = new UploadImageCommand(carClientService);
         commands.put(uploadImageCommand.getName(), uploadImageCommand);
 
-        DownloadImageCommand downloadImageCommand = new DownloadImageCommand(carWebServiceProxy);
+        DownloadImageCommand downloadImageCommand = new DownloadImageCommand(carClientService);
         commands.put(downloadImageCommand.getName(), downloadImageCommand);
 
         HelpCommand helpCommand = new HelpCommand(commands);

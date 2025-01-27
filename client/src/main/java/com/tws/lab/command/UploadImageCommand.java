@@ -1,6 +1,6 @@
 package com.tws.lab.command;
 
-import com.tws.lab.soap.CarWebService;
+import com.tws.lab.service.CarClientService;
 import com.tws.lab.soap.CarCrudException_Exception;
 
 import java.io.File;
@@ -9,10 +9,10 @@ import java.util.Base64;
 import java.util.Scanner;
 
 public class UploadImageCommand implements CliCommand {
-    private final CarWebService carWebService;
+    private final CarClientService carClientService;
 
-    public UploadImageCommand(CarWebService carWebService) {
-        this.carWebService = carWebService;
+    public UploadImageCommand(CarClientService carClientService) {
+        this.carClientService = carClientService;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class UploadImageCommand implements CliCommand {
             byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
-            boolean success = carWebService.uploadCarImage(id, base64Image);
+            boolean success = carClientService.uploadCarImage(id, base64Image);
             if (success) {
                 System.out.println("Изображение успешно загружено");
             } else {

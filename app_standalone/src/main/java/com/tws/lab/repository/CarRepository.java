@@ -23,7 +23,8 @@ public class CarRepository {
                     new ErrorBean("Лимит записей и смещение должны иметь значения >= 0.")
             );
         }
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
             CriteriaBuilder builder = entityManager.getCriteriaBuilder();
             CriteriaQuery<Car> criteriaQuery = builder.createQuery(Car.class);
             Root<Car> root = criteriaQuery.from(Car.class);
@@ -43,23 +44,35 @@ public class CarRepository {
                     new ErrorBean("Ошибка при обработке запроса." + e.getMessage()),
                     e
             );
+        } finally {
+            entityManager.close();
         }
     }
+
     public Car readCar(int id) {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
             return entityManager.find(Car.class, id);
+        } finally {
+            entityManager.close();
         }
     }
+
     public int createCar(Car car) {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
             entityManager.getTransaction().begin();
             entityManager.persist(car);
             entityManager.getTransaction().commit();
             return car.getId();
+        } finally {
+            entityManager.close();
         }
     }
+
     public boolean updateCar(int id, Car newDetails) {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
             entityManager.getTransaction().begin();
             Car existingCar = entityManager.find(Car.class, id);
             if (existingCar == null) {
@@ -81,10 +94,14 @@ public class CarRepository {
             
             entityManager.getTransaction().commit();
             return true;
+        } finally {
+            entityManager.close();
         }
     }
+
     public boolean deleteCarById(int id) {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        try {
             entityManager.getTransaction().begin();
             Car car = entityManager.find(Car.class, id);
             if (car == null) {
@@ -93,8 +110,11 @@ public class CarRepository {
             entityManager.remove(car);
             entityManager.getTransaction().commit();
             return true;
+        } finally {
+            entityManager.close();
         }
     }
+
     private Predicate parseQueryToPredicate(String query, CriteriaBuilder builder, Root<Car> root) {
         if (query == null || query.trim().isEmpty()) {
             return null;

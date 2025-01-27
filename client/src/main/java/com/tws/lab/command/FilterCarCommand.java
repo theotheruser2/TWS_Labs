@@ -1,9 +1,9 @@
 package com.tws.lab.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tws.lab.service.CarClientService;
 import com.tws.lab.soap.Car;
 import com.tws.lab.soap.CarListRequestDto;
-import com.tws.lab.soap.CarWebService;
 import com.tws.lab.utils.Util;
 import com.tws.lab.soap.CarCrudException_Exception;
 
@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Scanner;
 
 public class FilterCarCommand implements CliCommand {
-    private final CarWebService carWebService;
+    private final CarClientService carClientService;
     private final ObjectMapper objectMapper;
 
-    public FilterCarCommand(CarWebService carWebService, ObjectMapper objectMapper) {
-        this.carWebService = carWebService;
+    public FilterCarCommand(CarClientService carClientService, ObjectMapper objectMapper) {
+        this.carClientService = carClientService;
         this.objectMapper = objectMapper;
     }
 
@@ -40,7 +40,7 @@ public class FilterCarCommand implements CliCommand {
             carListRequestDto.setOffset(offset);
             carListRequestDto.setQuery(query);
 
-            List<Car> filteredCars = carWebService.searchCars(carListRequestDto);
+            List<Car> filteredCars = carClientService.searchCars(carListRequestDto);
             if (filteredCars.isEmpty()) {
                 System.out.println("Нет автомобилей, соответствующих критериям фильтрации.");
             } else {

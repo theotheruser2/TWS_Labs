@@ -32,7 +32,7 @@ public class Car {
     @Column(name = "owner_phone")
     private String owner_phone;
     
-    @Column(name = "image")
     @Lob
+    @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 }

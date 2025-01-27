@@ -1,6 +1,6 @@
 package com.tws.lab.command;
 
-import com.tws.lab.soap.CarWebService;
+import com.tws.lab.service.CarClientService;
 import com.tws.lab.soap.CarCrudException_Exception;
 
 import java.io.File;
@@ -9,11 +9,11 @@ import java.util.Base64;
 import java.util.Scanner;
 
 public class DownloadImageCommand implements CliCommand {
-    private final CarWebService carWebService;
+    private final CarClientService carClientService;
     private static final String IMAGES_DIR = "images";
 
-    public DownloadImageCommand(CarWebService carWebService) {
-        this.carWebService = carWebService;
+    public DownloadImageCommand(CarClientService carClientService) {
+        this.carClientService = carClientService;
         new File(IMAGES_DIR).mkdirs();
     }
 
@@ -23,7 +23,7 @@ public class DownloadImageCommand implements CliCommand {
             System.out.print("Введите ID автомобиля: ");
             int id = Integer.parseInt(scanner.nextLine());
 
-            String base64Image = carWebService.downloadCarImage(id);
+            String base64Image = carClientService.downloadCarImage(id);
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
             String fileName = String.format("%s/car_%d.jpg", IMAGES_DIR, id);

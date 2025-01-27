@@ -1,15 +1,21 @@
 package com.tws.lab.command;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tws.lab.service.CarClientService;
 import com.tws.lab.soap.Car;
-import com.tws.lab.soap.CarWebService;
+import com.tws.lab.soap.CarCrudException_Exception;
+
 import java.util.Scanner;
+
 public class FindCarByIdCommand implements CliCommand {
-    private final CarWebService carWebService;
+    private final CarClientService carClientService;
     private final ObjectMapper objectMapper;
-    public FindCarByIdCommand(CarWebService carWebService, ObjectMapper objectMapper) {
-        this.carWebService = carWebService;
+
+    public FindCarByIdCommand(CarClientService carClientService, ObjectMapper objectMapper) {
+        this.carClientService = carClientService;
         this.objectMapper = objectMapper;
     }
+
     @Override
     public void execute(Scanner scanner) {
         int id = -1;
@@ -35,7 +41,7 @@ public class FindCarByIdCommand implements CliCommand {
         }
 
         try {
-            Car car = carWebService.findCarById(id);
+            Car car = carClientService.findCarById(id);
             if (car == null) {
                 System.out.println("Автомобиль с ID №" + id + " не найден.");
                 return;
@@ -48,16 +54,18 @@ public class FindCarByIdCommand implements CliCommand {
             System.out.println(String.format("%-10d | %-10s | %-8s | %-15s | %-17s | %-5d",
                     car.getId(), car.getBrand(), car.getModel(), car.getLicensePlate(),
                     car.getOwnerPhone(), car.getReleaseYear()));
+        } catch (CarCrudException_Exception e) {
+            System.out.println("Ошибка при поиске автомобиля: " + e.getFaultInfo().getErrorInfo().getMessage());
         } catch (Exception e) {
             System.out.println("Ошибка при поиске автомобиля: " + e.getMessage());
         }
     }
 
-
     @Override
     public String getName() {
         return "findById";
     }
+
     @Override
     public String getDescription() {
         return "Поиск автомобиля по ID.";

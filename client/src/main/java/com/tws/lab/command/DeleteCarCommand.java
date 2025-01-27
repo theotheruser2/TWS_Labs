@@ -1,14 +1,15 @@
 package com.tws.lab.command;
 
-import com.tws.lab.soap.CarWebService;
+import com.tws.lab.service.CarClientService;
+import com.tws.lab.soap.CarCrudException_Exception;
 
 import java.util.Scanner;
 
 public class DeleteCarCommand implements CliCommand {
-    private final CarWebService carWebService;
+    private final CarClientService carClientService;
 
-    public DeleteCarCommand(CarWebService carWebService) {
-        this.carWebService = carWebService;
+    public DeleteCarCommand(CarClientService carClientService) {
+        this.carClientService = carClientService;
     }
 
     @Override
@@ -36,12 +37,14 @@ public class DeleteCarCommand implements CliCommand {
         }
 
         try {
-            boolean success = carWebService.deleteCarById(id);
+            boolean success = carClientService.deleteCarById(id);
             if (success) {
                 System.out.println("Запись об автомобиле успешно удалена.");
             } else {
                 System.out.println("Автомобиль с ID №" + id + " не найден.");
             }
+        } catch (CarCrudException_Exception e) {
+            System.out.println("Ошибка при удалении записи об автомобиле: " + e.getFaultInfo().getErrorInfo().getMessage());
         } catch (Exception e) {
             System.out.println("Ошибка при удалении записи об автомобиле: " + e.getMessage());
         }
