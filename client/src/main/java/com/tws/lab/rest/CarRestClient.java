@@ -13,10 +13,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Base64;
 
 public class CarRestClient {
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "password123";
     private final String baseUrl;
-    private final RestTemplate restTemplate;
+    private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
     public CarRestClient(String baseUrl) {
@@ -25,116 +33,135 @@ public class CarRestClient {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
         this.baseUrl = baseUrl;
-        this.restTemplate = new RestTemplate();
+        this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
     }
 
-    public List<Car> searchCars(String query, int limit, int offset) {
-        try {
-            // Split query into parts, encode only the values
-            String encodedQuery = null;
-            if (query != null && !query.trim().isEmpty()) {
-                String[] parts = query.split("\\s+");
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < parts.length; i++) {
-                    if (i > 0) {
-                        sb.append(" ");
-                    }
-                    // Don't encode operators or field names
-                    if (parts[i].equals("=") || parts[i].equals(">") || parts[i].equals("<") || 
-                        parts[i].equals(">=") || parts[i].equals("<=") || parts[i].equals("~") ||
-                        parts[i].equals("AND") || parts[i].equals("OR")) {
-                        sb.append(parts[i]);
-                    } else if (i % 3 == 2) {
-                        sb.append(URLEncoder.encode(parts[i], StandardCharsets.UTF_8));
-                    } else {
-                        sb.append(parts[i]);
-                    }
-                }
-                encodedQuery = sb.toString();
-            }
+    private String getBasicAuthHeader() {
+        String auth = USERNAME + ":" + PASSWORD;
+        return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
+    }
 
-            String url = UriComponentsBuilder.fromHttpUrl(baseUrl + "/api/cars/search")
-                    .queryParam("limit", limit)
-                    .queryParam("offset", offset)
-                    .queryParam("query", encodedQuery)
-                    .build(false) // Don't encode the full URL
-                    .toUriString();
+    public List<Car> searchCars(String query, int limit, int offset) throws RestClientException {
+        try {
+            String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+            URI uri = URI.create(String.format("%s/api/cars/search?query=%s&limit=%d&offset=%d", baseUrl, encodedQuery, limit, offset));
             
-            System.out.println("Requesting URL: " + url);
-            Car[] response = restTemplate.getForObject(url, Car[].class);
-            return response != null ? Arrays.asList(response) : Collections.emptyList();
-        } catch (HttpClientErrorException e) {
-            String errorMessage = extractErrorMessage(e);
-            throw new RestClientException("Ошибка при поиске записей об автомобиле: " + errorMessage);
-        } catch (Exception e) {
-            throw new RestClientException("Ошибка при поиске записей об автомобиле: " + e.getMessage());
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .GET()
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            
+            if (response.statusCode() == 200) {
+                return Arrays.asList(objectMapper.readValue(response.body(), Car[].class));
+            } else {
+                throw new RestClientException("Error searching cars: " + response.body());
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RestClientException("Error searching cars: " + e.getMessage());
         }
     }
 
-    public Car findById(Integer id) {
+    public Car findById(int id) throws RestClientException {
         try {
-            ResponseEntity<Car> response = restTemplate.getForEntity(
-                    baseUrl + "/api/cars/" + id,
-                    Car.class
-            );
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 404) {
+            URI uri = URI.create(baseUrl + "/api/cars/" + id);
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .GET()
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            
+            if (response.statusCode() == 200) {
+                return objectMapper.readValue(response.body(), Car.class);
+            } else if (response.statusCode() == 404) {
                 return null;
+            } else {
+                throw new RestClientException("Error finding car: " + response.body());
             }
-            String errorMessage = extractErrorMessage(e);
-            throw new RestClientException("Ошибка при поиске автомобиля: " + errorMessage);
-        } catch (Exception e) {
-            throw new RestClientException("Ошибка при поиске автомобиля: " + e.getMessage());
+        } catch (IOException | InterruptedException e) {
+            throw new RestClientException("Error finding car: " + e.getMessage());
         }
     }
 
-    public Car create(Car car) {
+    public Car create(Car car) throws RestClientException {
         try {
-            ResponseEntity<Car> response = restTemplate.postForEntity(
-                    baseUrl + "/api/cars",
-                    car,
-                    Car.class
-            );
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            String errorMessage = extractErrorMessage(e);
-            throw new RestClientException("Ошибка при создании записи об автомобиле: " + errorMessage);
-        } catch (Exception e) {
-            throw new RestClientException("Ошибка при создании записи об автомобиле: " + e.getMessage());
+            URI uri = URI.create(baseUrl + "/api/cars");
+            String jsonBody = objectMapper.writeValueAsString(car);
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .header("Authorization", getBasicAuthHeader())
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            
+            if (response.statusCode() == 201) {
+                return objectMapper.readValue(response.body(), Car.class);
+            } else if (response.statusCode() == 401 || response.statusCode() == 403) {
+                throw new RestClientException("Ошибка аутентификации: Неверные учетные данные");
+            } else {
+                throw new RestClientException("Error creating car: " + response.body());
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RestClientException("Error creating car: " + e.getMessage());
         }
     }
 
-    public Car update(Integer id, Car car) {
+    public Car update(int id, Car car) throws RestClientException {
         try {
-            ResponseEntity<Car> response = restTemplate.exchange(
-                    baseUrl + "/api/cars/" + id,
-                    HttpMethod.PUT,
-                    new org.springframework.http.HttpEntity<>(car),
-                    Car.class
-            );
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            String errorMessage = extractErrorMessage(e);
-            throw new RestClientException("Ошибка при обновлении записи об автомобиле: " + errorMessage);
-        } catch (Exception e) {
-            throw new RestClientException("Ошибка при обновлении записи об автомобиле: " + e.getMessage());
+            URI uri = URI.create(baseUrl + "/api/cars/" + id);
+            String jsonBody = objectMapper.writeValueAsString(car);
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .header("Authorization", getBasicAuthHeader())
+                .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            
+            if (response.statusCode() == 200) {
+                return objectMapper.readValue(response.body(), Car.class);
+            } else if (response.statusCode() == 401 || response.statusCode() == 403) {
+                throw new RestClientException("Ошибка аутентификации: Неверные учетные данные");
+            } else {
+                throw new RestClientException("Error updating car: " + response.body());
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RestClientException("Error updating car: " + e.getMessage());
         }
     }
 
-    public boolean delete(Integer id) {
+    public boolean delete(int id) throws RestClientException {
         try {
-            restTemplate.delete(baseUrl + "/api/cars/" + id);
-            return true;
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 404) {
+            URI uri = URI.create(baseUrl + "/api/cars/" + id);
+            
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Authorization", getBasicAuthHeader())
+                .DELETE()
+                .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            
+            if (response.statusCode() == 204) {
+                return true;
+            } else if (response.statusCode() == 404) {
                 return false;
+            } else if (response.statusCode() == 401 || response.statusCode() == 403) {
+                throw new RestClientException("Ошибка аутентификации: Неверные учетные данные");
+            } else {
+                throw new RestClientException("Error deleting car: " + response.body());
             }
-            String errorMessage = extractErrorMessage(e);
-            throw new RestClientException("Ошибка при удалении записи об автомобиле: " + errorMessage);
-        } catch (Exception e) {
-            throw new RestClientException("Ошибка при удалении записи об автомобиле: " + e.getMessage());
+        } catch (IOException | InterruptedException e) {
+            throw new RestClientException("Error deleting car: " + e.getMessage());
         }
     }
 
