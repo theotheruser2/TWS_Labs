@@ -101,15 +101,15 @@ public class CarRestClient {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             
-            if (response.statusCode() == 201) {
+            if (response.statusCode() == 201 || response.statusCode() == 200) {
                 return objectMapper.readValue(response.body(), Car.class);
             } else if (response.statusCode() == 401 || response.statusCode() == 403) {
                 throw new RestClientException("Ошибка аутентификации: Неверные учетные данные");
             } else {
-                throw new RestClientException("Error creating car: " + response.body());
+                throw new RestClientException("Ошибка при создании записи об автомобиле: " + response.body());
             }
         } catch (IOException | InterruptedException e) {
-            throw new RestClientException("Error creating car: " + e.getMessage());
+            throw new RestClientException("Ошибка при создании записи об автомобиле: " + e.getMessage());
         }
     }
 
@@ -150,18 +150,22 @@ public class CarRestClient {
                 .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            String responseBody = response.body();
             
-            if (response.statusCode() == 204) {
+            if (response.statusCode() == 204 || response.statusCode() == 200) {
                 return true;
             } else if (response.statusCode() == 404) {
                 return false;
             } else if (response.statusCode() == 401 || response.statusCode() == 403) {
                 throw new RestClientException("Ошибка аутентификации: Неверные учетные данные");
             } else {
-                throw new RestClientException("Error deleting car: " + response.body());
+                String errorMessage = responseBody != null && !responseBody.isEmpty() 
+                    ? responseBody 
+                    : "Сервер вернул код состояния: " + response.statusCode();
+                throw new RestClientException("Ошибка при удалении записи об автомобиле: " + errorMessage);
             }
         } catch (IOException | InterruptedException e) {
-            throw new RestClientException("Error deleting car: " + e.getMessage());
+            throw new RestClientException("Ошибка при удалении записи об автомобиле: " + e.getMessage());
         }
     }
 
